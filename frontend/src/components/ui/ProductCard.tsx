@@ -14,31 +14,36 @@ function ProductCard({
   inStock,
 }: ProductCardProps) {
   return (
-    <div className="w-72 overflow-hidden rounded-2xl bg-white shadow-md transition duration-300 hover:-translate-y-2 hover:shadow-xl">
+    <div className="overflow-hidden rounded-2xl bg-white shadow-md transition duration-300 hover:-translate-y-2 hover:shadow-xl">
 
       <img
-        src={image}
+        src={
+    image ||
+    "https://placehold.co/400x400?text=No+Image"
+}
         alt={name}
-        className="h-56 w-full object-cover"
+        className="h-60 w-full object-cover"
       />
 
       <div className="p-5">
 
-        <h2 className="text-xl font-semibold">
+        <h3 className="text-xl font-semibold">
           {name}
-        </h2>
+        </h3>
 
         <p className="mt-2 text-yellow-500">
           ⭐ {rating}
         </p>
 
-        <p className="mt-2 text-2xl font-bold text-blue-600">
+        <p className="mt-3 text-2xl font-bold text-blue-600">
           ₹{price.toLocaleString()}
         </p>
 
         <p
           className={`mt-2 font-medium ${
-            inStock ? "text-green-600" : "text-red-600"
+            inStock
+              ? "text-green-600"
+              : "text-red-600"
           }`}
         >
           {inStock ? "✓ In Stock" : "Out of Stock"}
@@ -52,6 +57,7 @@ function ProductCard({
         </button>
 
       </div>
+
     </div>
   );
 }

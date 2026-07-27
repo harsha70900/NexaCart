@@ -1,58 +1,61 @@
-//import HeroSection from "../components/home/HeroSection";
+import HeroSection from "../components/home/HeroSection";
 import CategorySection from "../components/home/CategorySection";
 import ProductCard from "../components/ui/ProductCard";
-
-const products = [
-  {
-    id: 1,
-    name: "iPhone 16 Pro",
-    price: 89999,
-    image: "https://picsum.photos/400/300?random=1",
-    rating: 4.8,
-    inStock: true,
-  },
-  {
-    id: 2,
-    name: "MacBook Pro M4",
-    price: 179999,
-    image: "https://picsum.photos/400/300?random=2",
-    rating: 4.9,
-    inStock: true,
-  },
-  {
-    id: 3,
-    name: "Sony WH-1000XM5",
-    price: 29999,
-    image: "https://picsum.photos/400/300?random=3",
-    rating: 4.7,
-    inStock: false,
-  },
-];
+import { useEffect, useState } from "react";
+import { getProducts } from "../api/productApi";
+import type { Product } from "../types/product";
 
 function HomePage() {
+
+  const [products, setProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+
+    async function loadProducts() {
+
+        try {
+
+            const data = await getProducts();
+
+            console.log(data);
+
+            setProducts(data);
+
+        } catch (error) {
+
+            console.error(error);
+
+        }
+
+    }
+
+    loadProducts();
+
+}, []);
+
   return (
     <>
-     
+      <HeroSection />
 
       <CategorySection />
 
-      <section className="mx-auto max-w-7xl px-6 py-12">
+      <section className="mx-auto max-w-7xl px-6 py-16">
 
-        <h2 className="mb-8 text-3xl font-bold">
+        <h2 className="mb-8 text-4xl font-bold">
           Featured Products
         </h2>
 
-        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
 
           {products.map((product) => (
             <ProductCard
-              key={product.id}
-              name={product.name}
-              price={product.price}
-              image={product.image}
-              rating={product.rating}
-              inStock={product.inStock}
-            />
+    key={product.id}
+    name={product.name}
+    price={product.price}
+    image={product.imageUrl}
+    rating={4.8}
+    inStock={product.stock > 0}
+/>
           ))}
 
         </div>
