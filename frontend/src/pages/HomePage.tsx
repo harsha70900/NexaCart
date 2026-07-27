@@ -1,37 +1,46 @@
 import HeroSection from "../components/home/HeroSection";
 import CategorySection from "../components/home/CategorySection";
 import ProductCard from "../components/ui/ProductCard";
-import { useEffect, useState } from "react";
 import { getProducts } from "../api/productApi";
-import type { Product } from "../types/product";
+import LoadingSpinner from "../components/ui/LoadingSpinner";
+import { useQuery } from "@tanstack/react-query";
 
 function HomePage() {
 
-  const [products, setProducts] = useState<Product[]>([]);
+ const {
+    data: products = [],
+    isLoading,
+    error,
+} = useQuery({
+    queryKey: ["products"],
+    queryFn: getProducts,
+});
 
-  useEffect(() => {
+if (isLoading) {
+    return <LoadingSpinner />;
+}
 
-    async function loadProducts() {
+if(error) {
+  return (
+    <h2 className="text-center text-red-600">
+            Failed to load products.
+        </h2>
+  );
+}
 
-        try {
+if (products.length === 0) {
 
-            const data = await getProducts();
+    return (
 
-            console.log(data);
+        <h2 className="p-10 text-center">
 
-            setProducts(data);
+            No Products Available
 
-        } catch (error) {
+        </h2>
 
-            console.error(error);
+    );
 
-        }
-
-    }
-
-    loadProducts();
-
-}, []);
+}
 
   return (
     <>
@@ -50,6 +59,7 @@ function HomePage() {
           {products.map((product) => (
             <ProductCard
     key={product.id}
+    productId={product.id}
     name={product.name}
     price={product.price}
     image={product.imageUrl}

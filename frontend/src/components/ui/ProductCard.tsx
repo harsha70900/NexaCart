@@ -1,4 +1,11 @@
+import { useMutation } from "@tanstack/react-query";
+import { addToCart } from "../../api/cartApi";
+import {
+  useQueryClient,
+} from "@tanstack/react-query";
+
 type ProductCardProps = {
+  productId: number;
   name: string;
   price: number;
   image: string;
@@ -7,12 +14,36 @@ type ProductCardProps = {
 };
 
 function ProductCard({
+  productId,
   name,
   price,
   image,
   rating,
   inStock,
 }: ProductCardProps) {
+
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+
+    mutationFn: addToCart,
+
+    onSuccess: () => {
+
+        queryClient.invalidateQueries({
+            queryKey: ["cart"],
+        });
+         console.log("Added to cart");
+
+    },
+     onError: (error) => {
+
+        console.error(error);
+
+    },
+
+});
+
   return (
     <div className="overflow-hidden rounded-2xl bg-white shadow-md transition duration-300 hover:-translate-y-2 hover:shadow-xl">
 
@@ -49,12 +80,14 @@ function ProductCard({
           {inStock ? "✓ In Stock" : "Out of Stock"}
         </p>
 
-        <button
-          disabled={!inStock}
-          className="mt-5 w-full rounded-lg bg-blue-600 py-3 text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-400"
-        >
-          Add to Cart
-        </button>
+        <button className="w-full mt-4 bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white font-semibold py-2.5 px-4 rounded-xl shadow-sm transition duration-200 ease-in-out"
+    disabled={mutation.isPending}
+    onClick={() => mutation.mutate(productId)}
+> 
+    {mutation.isPending
+        ? "Adding..."
+        : "Add to Cart"}
+</button>
 
       </div>
 
