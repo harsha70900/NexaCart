@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import com.example.jwtDemo.dto.ProductResponse;
 import com.example.jwtDemo.service.ProductService;
 
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/products")
 public class ProductController {
