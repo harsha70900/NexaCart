@@ -1,28 +1,96 @@
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { login } from "../api/authApi";
+import axios from "axios";
 
 function LoginPage() {
 
-    const navigate = useNavigate();
+    const [username, setUsername] = useState("");
 
-    function handleLogin() {
+    const [password, setPassword] = useState("");
 
-        alert("Login Successful!");
+    const loginMutation = useMutation({
 
-        navigate("/products");
+    mutationFn: login,
 
+    onSuccess(data) {
+
+        console.log(data);
+
+    },
+
+onError(error) {
+    if (axios.isAxiosError(error)) {
+        console.log("Status:", error.response?.status);
+        console.log("Response:", error.response?.data);
+    } else {
+        console.log(error);
     }
+}
+
+});
+
+const handleSubmit = (
+    event: React.FormEvent<HTMLFormElement>
+) => {
+
+    event.preventDefault();
+
+    loginMutation.mutate({
+
+        username,
+
+        password,
+
+    });
+
+};
 
     return (
-        <div className="flex min-h-screen items-center justify-center">
+        <div className="mx-auto mt-20 max-w-md rounded-xl bg-white p-8 shadow-lg">
 
-            <button
-                onClick={handleLogin}
-                className="rounded bg-blue-600 px-6 py-3 text-white hover:bg-blue-700"
-            >
-                Login
-            </button>
+    <h1 className="mb-8 text-center text-3xl font-bold">
 
-        </div>
+        Login
+
+    </h1>
+
+    <form
+        onSubmit={handleSubmit}
+        className="space-y-5"
+    >
+
+        <input
+            type="text"
+            placeholder="Username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            className="w-full rounded-lg border p-3"
+        />
+
+        <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full rounded-lg border p-3"
+        />
+
+        <button
+            type="submit"
+            disabled={loginMutation.isPending}
+            className="w-full rounded-lg bg-blue-600 py-3 font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
+        >
+
+            {loginMutation.isPending
+                ? "Logging in..."
+                : "Login"}
+
+        </button>
+
+    </form>
+
+</div>
     );
 }
 
