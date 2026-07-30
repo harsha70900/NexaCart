@@ -8,6 +8,7 @@ import {
 
 import App from "./App";
 import "./index.css";
+import { AuthProvider } from "./context/AuthContext";
 
 const queryClient = new QueryClient();
 
@@ -15,7 +16,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     <React.StrictMode>
         <QueryClientProvider client={queryClient}>
             <BrowserRouter>
+             <AuthProvider>
                 <App />
+             </AuthProvider>
             </BrowserRouter>
         </QueryClientProvider>
     </React.StrictMode>

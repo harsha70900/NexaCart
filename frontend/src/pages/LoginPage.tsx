@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { login } from "../api/authApi";
+import { login as loginApi } from "../api/authApi";
 import axios from "axios";
 import { saveToken } from "../utils/token";
+import { useAuth } from "../hooks/useAuth";
 
 function LoginPage() {
 
@@ -10,29 +11,28 @@ function LoginPage() {
 
     const [password, setPassword] = useState("");
 
-    const loginMutation = useMutation({
+    const { login } = useAuth();
 
-    mutationFn: login,
+const loginMutation = useMutation({
+    mutationFn: loginApi,
 
     onSuccess(data) {
+        saveToken(data.token);
 
-    saveToken(data.token);
+        login();
 
-    console.log("Login Successful");
+        console.log("Login Successful");
+        console.log(data);
+    },
 
-    console.log(data);
-
-},
-
-onError(error) {
-    if (axios.isAxiosError(error)) {
-        console.log("Status:", error.response?.status);
-        console.log("Response:", error.response?.data);
-    } else {
-        console.log(error);
-    }
-}
-
+    onError(error) {
+        if (axios.isAxiosError(error)) {
+            console.log("Status:", error.response?.status);
+            console.log("Response:", error.response?.data);
+        } else {
+            console.log(error);
+        }
+    },
 });
 
 const handleSubmit = (
