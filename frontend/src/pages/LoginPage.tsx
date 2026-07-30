@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { login } from "../api/authApi";
 import axios from "axios";
+import { saveToken } from "../utils/token";
 
 function LoginPage() {
 
@@ -15,9 +16,13 @@ function LoginPage() {
 
     onSuccess(data) {
 
-        console.log(data);
+    saveToken(data.token);
 
-    },
+    console.log("Login Successful");
+
+    console.log(data);
+
+},
 
 onError(error) {
     if (axios.isAxiosError(error)) {
