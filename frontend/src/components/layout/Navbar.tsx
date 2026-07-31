@@ -1,8 +1,19 @@
 import { Link, useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { getCart } from "../../api/cartApi";
 import { useAuth } from "../../hooks/useAuth";
+
 function Navbar() {
 
 const { isAuthenticated, logout } = useAuth();
+
+const { data: cart } = useQuery({
+    queryKey: ["cart"],
+    queryFn: getCart,
+    enabled: isAuthenticated,
+});
+
+const cartCount = cart?.items.length ?? 0;
 
 const navigate = useNavigate();
 
@@ -15,6 +26,8 @@ const navigate = useNavigate();
     navigate("/");
 
 };
+
+
 
   return (
     <nav className="bg-slate-900 text-white shadow-md">
@@ -47,14 +60,21 @@ const navigate = useNavigate();
           {isAuthenticated ? (
     <>
         <Link
-            to="/cart"
-            className="transition hover:text-blue-400"
-        >
-            Cart
-        </Link>
+    to="/cart"
+    className="relative"
+>
+    Cart
+
+    {cartCount > 0 && (
+        <span className="absolute -right-5 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-xs font-bold text-white">
+            {cartCount}
+        </span>
+    )}
+</Link>
 
         <button
             className="transition hover:text-red-400"
+            onClick={handleLogout}
         >
             Logout
         </button>
