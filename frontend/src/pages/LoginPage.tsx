@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { login as loginApi } from "../api/authApi";
-import axios from "axios";
 import { saveToken } from "../utils/token";
 import { useAuth } from "../hooks/useAuth";
-
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 function LoginPage() {
 
     const [username, setUsername] = useState("");
@@ -12,6 +12,8 @@ function LoginPage() {
     const [password, setPassword] = useState("");
 
     const { login } = useAuth();
+
+    const navigate = useNavigate();
 
 const loginMutation = useMutation({
     mutationFn: loginApi,
@@ -21,17 +23,15 @@ const loginMutation = useMutation({
 
         login();
 
-        console.log("Login Successful");
-        console.log(data);
+        toast.success("Login Successful");
+        navigate("/");
     },
 
-    onError(error) {
-        if (axios.isAxiosError(error)) {
-            console.log("Status:", error.response?.status);
-            console.log("Response:", error.response?.data);
-        } else {
-            console.log(error);
-        }
+    onError: () => {
+
+    toast.error("Invalid username or password");
+
+
     },
 });
 

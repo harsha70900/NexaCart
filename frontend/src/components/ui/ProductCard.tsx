@@ -1,8 +1,9 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
+
 import { addToCart } from "../../api/cartApi";
 import { useAuth } from "../../hooks/useAuth";
-import { useNavigate } from "react-router-dom";
 
 type ProductCardProps = {
     productId: number;
@@ -22,8 +23,8 @@ function ProductCard({
     inStock,
 }: ProductCardProps) {
 
-  const { isAuthenticated } = useAuth();
-const navigate = useNavigate();
+    const { isAuthenticated } = useAuth();
+    const navigate = useNavigate();
 
     const queryClient = useQueryClient();
 
@@ -32,35 +33,48 @@ const navigate = useNavigate();
 
         onSuccess: (message) => {
 
-    queryClient.invalidateQueries({
-        queryKey: ["cart"],
-    });
+            queryClient.invalidateQueries({
+                queryKey: ["cart"],
+            });
 
-    alert(message);
-},
+            toast.success(message);
 
-        onError: (error) => {
-            console.error(error);
         },
+
+        onError: (error: any) => {
+
+            console.error(error);
+
+            toast.error(
+                error?.response?.data?.message ??
+                "Failed to add product to cart."
+            );
+
+        },
+
     });
 
     const handleAddToCart = () => {
 
-    if (!isAuthenticated) {
-        navigate("/login");
-        return;
-    }
+        if (!isAuthenticated) {
 
-    mutation.mutate({
-        productId,
-        quantity: 1,
-    });
-};
+            toast.error("Please login to continue.");
+
+            navigate("/login");
+
+            return;
+        }
+
+        mutation.mutate({
+            productId,
+            quantity: 1,
+        });
+    };
 
     return (
         <div className="overflow-hidden rounded-2xl bg-white shadow-md transition duration-300 hover:-translate-y-2 hover:shadow-xl">
 
-            {/* Everything inside Link navigates to Product Details */}
+            {/* Product Details */}
             <Link to={`/products/${productId}`}>
 
                 <img
@@ -102,17 +116,22 @@ const navigate = useNavigate();
 
             </Link>
 
-            {/* Button is outside Link */}
+            {/* Add to Cart Button */}
             <div className="px-5 pb-5">
+
                 <button
-    onClick={handleAddToCart}
-    disabled={mutation.isPending || !inStock}
-    className="w-full rounded-lg bg-blue-600 py-3 text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
->
-    {mutation.isPending
-        ? "Adding..."
-        : "Add to Cart"}
-</button>
+                    onClick={handleAddToCart}
+                    disabled={
+                        mutation.isPending ||
+                        !inStock
+                    }
+                    className="w-full rounded-lg bg-blue-600 py-3 font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                    {mutation.isPending
+                        ? "Adding..."
+                        : "Add to Cart"}
+                </button>
+
             </div>
 
         </div>

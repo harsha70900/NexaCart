@@ -6,7 +6,7 @@ import { useMutation } from "@tanstack/react-query";
 import { addToCart } from "../api/cartApi";
 import { useAuth } from "../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
-
+import toast from "react-hot-toast";
 function ProductDetailsPage() {
 
     const { isAuthenticated } = useAuth();
@@ -16,15 +16,17 @@ const navigate = useNavigate();
     mutationFn: addToCart,
 
     onSuccess: (message) => {
-        alert(message);
+        toast.success(message);
     },
 
     onError: (error: any) => {
-        alert(
-            error?.response?.data?.message ??
-            "Failed to add product to cart."
-        );
-    },
+
+    toast.error(
+        error?.response?.data?.message ??
+        "Failed to add product"
+    );
+
+},
 });
 
 const handleAddToCart = () => {

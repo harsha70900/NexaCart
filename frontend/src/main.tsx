@@ -9,6 +9,7 @@ import {
 import App from "./App";
 import "./index.css";
 import { AuthProvider } from "./context/AuthContext";
+import { Toaster } from "react-hot-toast";
 
 const queryClient = new QueryClient();
 
@@ -18,6 +19,13 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             <BrowserRouter>
              <AuthProvider>
                 <App />
+                <Toaster
+                position="top-right"
+                reverseOrder={false}
+                toastOptions={{
+                    duration: 2500,
+                }}
+            />
              </AuthProvider>
             </BrowserRouter>
         </QueryClientProvider>

@@ -5,7 +5,7 @@ import {
     updateCartItem,
     removeCartItem,
 } from "../api/cartApi";
-
+import toast from "react-hot-toast";
 function CartPage() {
 
     const queryClient = useQueryClient();
@@ -48,10 +48,18 @@ function CartPage() {
             queryClient.invalidateQueries({
                 queryKey: ["cart"],
             });
+            toast.success("Product removed successfully from cart");
         },
 
-        onError: (error) => {
+        onError: (error: any) => {
+
             console.error(error);
+
+            toast.error(
+                error?.response?.data?.message ??
+                "Failed to remove product from cart."
+            );
+
         },
 
     });
