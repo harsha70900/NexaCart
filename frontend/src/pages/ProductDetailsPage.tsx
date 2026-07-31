@@ -2,8 +2,45 @@ import { useParams } from "react-router-dom";
 import { getProductById } from "../api/productApi";
 import { useQuery } from "@tanstack/react-query";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
+import { useMutation } from "@tanstack/react-query";
+import { addToCart } from "../api/cartApi";
+import { useAuth } from "../hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 
 function ProductDetailsPage() {
+
+    const { isAuthenticated } = useAuth();
+const navigate = useNavigate();
+    
+    const addToCartMutation = useMutation({
+    mutationFn: addToCart,
+
+    onSuccess: (message) => {
+        alert(message);
+    },
+
+    onError: (error: any) => {
+        alert(
+            error?.response?.data?.message ??
+            "Failed to add product to cart."
+        );
+    },
+});
+
+const handleAddToCart = () => {
+
+    if (!isAuthenticated) {
+        navigate("/login");
+        return;
+    }
+
+    if (!product) return;
+
+    addToCartMutation.mutate({
+        productId: product.id,
+        quantity: 1,
+    });
+};
 
     const {id} = useParams();
     const productId = Number(id);
@@ -117,13 +154,14 @@ function ProductDetailsPage() {
                 </div>
 
                 <button
-                    className="mt-10 rounded-lg bg-blue-600 px-8 py-4 font-semibold text-white transition hover:bg-blue-700"
-                    disabled={product.stock === 0}
-                >
-
-                    Add to Cart
-
-                </button>
+    onClick={handleAddToCart}
+    disabled={addToCartMutation.isPending}
+    className="bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700 disabled:opacity-50"
+>
+    {addToCartMutation.isPending
+        ? "Adding..."
+        : "Add to Cart"}
+</button>
 
             </div>
 

@@ -2,7 +2,7 @@ import {
     createContext,
     useState,
     useEffect,
-    ReactNode,
+    type ReactNode,
 } from "react";
 
 import { getToken, removeToken } from "../utils/token";
