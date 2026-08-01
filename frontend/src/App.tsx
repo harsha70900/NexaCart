@@ -10,7 +10,7 @@ import NotFoundPage from "./pages/NotFoundPage";
 import ProductDetailsPage from "./pages/ProductDetailsPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import CheckoutPage from "./pages/CheckoutPage";
-
+import OrderSuccessPage from "./pages/OrderSuccessPage";
 function App() {
   return (
     <Routes>
@@ -44,6 +44,15 @@ function App() {
     element={
         <ProtectedRoute>
             <CheckoutPage />
+        </ProtectedRoute>
+    }
+/>
+
+<Route
+    path="/order-success"
+    element={
+        <ProtectedRoute>
+            <OrderSuccessPage />
         </ProtectedRoute>
     }
 />

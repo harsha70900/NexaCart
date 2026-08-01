@@ -49,11 +49,11 @@ const queryClient = useQueryClient();
 
         toast.success(message);
 
-        queryClient.invalidateQueries({
-            queryKey: ["cart"],
-        });
+queryClient.invalidateQueries({
+    queryKey: ["cart"],
+});
 
-        navigate("/");
+navigate("/order-success");
 
     } catch (error: any) {
 
