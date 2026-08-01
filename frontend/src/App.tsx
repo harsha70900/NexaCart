@@ -9,6 +9,7 @@ import CartPage from "./pages/CartPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import ProductDetailsPage from "./pages/ProductDetailsPage";
 import ProtectedRoute from "./components/ProtectedRoute";
+import CheckoutPage from "./pages/CheckoutPage";
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
     }
 />
 
+
         <Route path="/login" element={<LoginPage />} />
 
         <Route path="/products/:id" element={<ProductDetailsPage/>} />
@@ -36,6 +38,15 @@ function App() {
       </Route>
 
       <Route path="*" element={<NotFoundPage />} />
+
+      <Route
+    path="/checkout"
+    element={
+        <ProtectedRoute>
+            <CheckoutPage />
+        </ProtectedRoute>
+    }
+/>
 
     </Routes>
   );

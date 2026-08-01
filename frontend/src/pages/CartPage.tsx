@@ -6,7 +6,11 @@ import {
     removeCartItem,
 } from "../api/cartApi";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
+
 function CartPage() {
+
+    const navigate = useNavigate();
 
     const queryClient = useQueryClient();
 
@@ -247,10 +251,11 @@ function CartPage() {
                         </div>
 
                         <button
-                            className="mt-8 w-full rounded-xl bg-blue-600 py-3 text-lg font-semibold text-white transition hover:bg-blue-700"
-                        >
-                            Proceed to Checkout
-                        </button>
+    onClick={() => navigate("/checkout")}
+    className="mt-8 w-full rounded-xl bg-blue-600 py-3 text-lg font-semibold text-white transition hover:bg-blue-700"
+>
+    Proceed to Checkout
+</button>
 
                     </div>
 
