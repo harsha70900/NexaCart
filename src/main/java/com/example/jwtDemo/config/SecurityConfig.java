@@ -60,7 +60,7 @@ public class SecurityConfig {
                     ).permitAll()
                     .requestMatchers("/auth/**", "/hello").permitAll()
                     // 2. Added public endpoint for product viewing so it doesn't return 403
-                    .requestMatchers("/customer/products", "/products").permitAll() 
+                    .requestMatchers("/customer/products", "/products/**").permitAll() 
                     .requestMatchers("/customer/cart/**").hasRole("USER")
                     .requestMatchers("/customer/payment/**").hasRole("USER")
                     .requestMatchers("/products/**").hasAnyRole("USER", "ADMIN")
