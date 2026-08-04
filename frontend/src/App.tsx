@@ -15,72 +15,89 @@ import MyOrdersPage from "./pages/MyOrdersPage";
 import OrderDetailsPage from "./pages/OrderDetailsPage";
 
 function App() {
-  return (
-    <Routes>
 
-      <Route element={<Layout />}>
+    return (
 
-        <Route path="/" element={<HomePage />} />
+        <Routes>
 
-        <Route path="/products" element={<ProductsPage />} />
+            <Route element={<Layout />}>
 
-        <Route
-    path="/cart"
-    element={
-        <ProtectedRoute>
-            <CartPage />
-        </ProtectedRoute>
-    }
-/>
+                <Route
+                    path="/"
+                    element={<HomePage />}
+                />
 
+                <Route
+                    path="/products"
+                    element={<ProductsPage />}
+                />
 
-        <Route path="/login" element={<LoginPage />} />
+                <Route
+                    path="/products/:id"
+                    element={<ProductDetailsPage />}
+                />
 
-        <Route path="/products/:id" element={<ProductDetailsPage/>} />
+                <Route
+                    path="/login"
+                    element={<LoginPage />}
+                />
 
-      </Route>
+                <Route
+                    path="/cart"
+                    element={
+                        <ProtectedRoute>
+                            <CartPage />
+                        </ProtectedRoute>
+                    }
+                />
 
-      <Route path="*" element={<NotFoundPage />} />
+                <Route
+                    path="/checkout"
+                    element={
+                        <ProtectedRoute>
+                            <CheckoutPage />
+                        </ProtectedRoute>
+                    }
+                />
 
-      <Route
-    path="/checkout"
-    element={
-        <ProtectedRoute>
-            <CheckoutPage />
-        </ProtectedRoute>
-    }
+                <Route
+                    path="/orders"
+                    element={
+                        <ProtectedRoute>
+                            <MyOrdersPage />
+                        </ProtectedRoute>
+                    }
+                />
 
-/>
+                <Route
+                    path="/orders/:orderId"
+                    element={
+                        <ProtectedRoute>
+                            <OrderDetailsPage />
+                        </ProtectedRoute>
+                    }
+                />
 
-<Route
-    path="/orders"
-    element={
-        <ProtectedRoute>
-            <MyOrdersPage />
-        </ProtectedRoute>
-    }
-/>
+                <Route
+                    path="/order-success"
+                    element={
+                        <ProtectedRoute>
+                            <OrderSuccessPage />
+                        </ProtectedRoute>
+                    }
+                />
 
-<Route
-    path="/order-success"
-    element={
-        <ProtectedRoute>
-            <OrderSuccessPage />
-        </ProtectedRoute>
-    }
-/>
+            </Route>
 
-<Route
-    path="/orders/:orderId"
-    element={
-        <ProtectedRoute>
-            <OrderDetailsPage />
-        </ProtectedRoute>
-    }
-/>
+            <Route
+                path="*"
+                element={<NotFoundPage />}
+            />
 
-    </Routes>
-  );
+        </Routes>
+
+    );
+
 }
 
 export default App;

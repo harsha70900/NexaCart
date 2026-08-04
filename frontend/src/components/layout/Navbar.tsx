@@ -46,7 +46,7 @@ const navigate = useNavigate();
             to="/"
             className="transition hover:text-blue-400"
           >
-            Home
+            🏠 Home
           </Link>
           
 
@@ -54,7 +54,7 @@ const navigate = useNavigate();
             to="/products"
             className="transition hover:text-blue-400"
           >
-            Products
+            🛍 Products
           </Link>
 
           {isAuthenticated ? (
@@ -63,7 +63,7 @@ const navigate = useNavigate();
     to="/cart"
     className="relative"
 >
-    Cart
+    🛒 Cart
 
     {cartCount > 0 && (
         <span className="absolute -right-5 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-xs font-bold text-white">
@@ -72,19 +72,28 @@ const navigate = useNavigate();
     )}
 </Link>
 
+{isAuthenticated && (
+    <Link
+        to="/orders"
+        className="transition hover:text-blue-400"
+    >
+        📦 Orders
+    </Link>
+)}
+
         <button
-            className="transition hover:text-red-400"
-            onClick={handleLogout}
-        >
-            Logout
-        </button>
+    className="text-red-400/80 transition-colors duration-200 hover:text-red-500 font-medium"
+    onClick={handleLogout}
+>
+    👤 Logout
+</button>
     </>
 ) : (
     <Link
         to="/login"
         className="transition hover:text-blue-400"
     >
-        Login
+        🔐 Login
     </Link>
 )}
 
