@@ -1,8 +1,11 @@
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import { ArrowLeft, Package } from "lucide-react";
 
 import { getOrder } from "../api/orderApi";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
+import OrderSummaryCard from "../components/order/OrderSummaryCard";
+import OrderProductCard from "../components/order/OrderProductCard";
 
 function OrderDetailsPage() {
 
@@ -44,99 +47,86 @@ function OrderDetailsPage() {
 
     return (
 
-        <div className="mx-auto max-w-6xl px-6 py-12">
+        <div className="min-h-screen bg-slate-50">
 
-            <h1 className="mb-8 text-4xl font-bold">
+            <div className="mx-auto max-w-7xl px-6 py-10">
 
-                Order #{order.orderId}
+                {/* Back Button */}
 
-            </h1>
+                <Link
+                    to="/orders"
+                    className="mb-8 inline-flex items-center gap-2 text-blue-600 transition hover:text-blue-700"
+                >
+                    <ArrowLeft size={18} />
 
-            <div className="mb-8 rounded-xl bg-white p-6 shadow">
+                    Back to My Orders
 
-                <p className="text-lg">
+                </Link>
 
-                    Status:
+                {/* Header */}
 
-                    <span className="ml-2 font-semibold text-green-600">
+                <div className="mb-10 flex items-center gap-4">
 
-                        {order.status}
+                    <div className="rounded-2xl bg-blue-600 p-4 text-white shadow-lg">
 
-                    </span>
-
-                </p>
-
-                <p className="mt-3 text-2xl font-bold text-blue-600">
-
-                    Total : ₹{order.totalAmount.toLocaleString()}
-
-                </p>
-
-            </div>
-
-            <div className="space-y-6">
-
-                {order.items.map((item) => (
-
-                    <div
-                        key={item.productId}
-                        className="flex items-center gap-6 rounded-xl border bg-white p-6 shadow-sm"
-                    >
-
-                        <img
-                            src={
-                                item.imageUrl ||
-                                "https://placehold.co/150x150?text=No+Image"
-                            }
-                            alt={item.productName}
-                            className="h-32 w-32 rounded-lg object-cover"
-                        />
-
-                        <div className="flex-1">
-
-                            <h2 className="text-2xl font-semibold">
-
-                                {item.productName}
-
-                            </h2>
-
-                            <p className="mt-2">
-
-                                Price :
-
-                                <span className="ml-2 font-medium">
-
-                                    ₹{item.price.toLocaleString()}
-
-                                </span>
-
-                            </p>
-
-                            <p className="mt-2">
-
-                                Quantity :
-
-                                <span className="ml-2 font-medium">
-
-                                    {item.quantity}
-
-                                </span>
-
-                            </p>
-
-                            <p className="mt-2 text-lg font-bold text-blue-600">
-
-                                Subtotal :
-
-                                ₹{item.subtotal.toLocaleString()}
-
-                            </p>
-
-                        </div>
+                        <Package size={34} />
 
                     </div>
 
-                ))}
+                    <div>
+
+                        <h1 className="text-5xl font-bold text-slate-900">
+
+                            Order #{order.orderId}
+
+                        </h1>
+
+                        <p className="mt-2 text-lg text-slate-500">
+
+                            View complete information about this order.
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+                {/* Summary */}
+
+                <OrderSummaryCard
+                    status={order.status}
+                    totalAmount={order.totalAmount}
+                    itemCount={order.items.length}
+                />
+
+                {/* Products */}
+
+                <div className="mt-12">
+
+                    <h2 className="mb-6 text-3xl font-bold text-slate-900">
+
+                        Purchased Products
+
+                    </h2>
+
+                    <div className="space-y-6">
+
+                        {order.items.map((item) => (
+
+                            <OrderProductCard
+                                key={item.productId}
+                                imageUrl={item.imageUrl}
+                                productName={item.productName}
+                                price={item.price}
+                                quantity={item.quantity}
+                                subtotal={item.subtotal}
+                            />
+
+                        ))}
+
+                    </div>
+
+                </div>
 
             </div>
 
