@@ -7,6 +7,14 @@ import {
 } from "../api/cartApi";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import {
+    ShoppingCart,
+    ShieldCheck,
+    Trash2,
+    Plus,
+    Minus,
+    Package,
+} from "lucide-react";
 
 function CartPage() {
 
@@ -97,9 +105,34 @@ function CartPage() {
     return (
         <div className="mx-auto max-w-7xl px-6 py-10">
 
-            <h1 className="mb-10 text-4xl font-bold">
-                Shopping Cart
-            </h1>
+            <div className="mb-10 flex items-center gap-5">
+
+    <div className="rounded-2xl bg-blue-600 p-4 shadow-lg">
+
+        <ShoppingCart
+            size={34}
+            className="text-white"
+        />
+
+    </div>
+
+    <div>
+
+        <h1 className="text-5xl font-bold text-slate-900">
+
+            Shopping Cart
+
+        </h1>
+
+        <p className="mt-2 text-lg text-slate-500">
+
+            Review your selected products before proceeding to checkout.
+
+        </p>
+
+    </div>
+
+</div>
 
             <div className="grid gap-8 lg:grid-cols-3">
 
@@ -111,7 +144,7 @@ function CartPage() {
 
                         <div
                             key={item.cartItemId}
-                            className="flex flex-col gap-6 rounded-2xl bg-white p-6 shadow-md md:flex-row"
+                           className="flex flex-col gap-6 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl md:flex-row"
                         >
 
                             {/* Product Image */}
@@ -122,7 +155,7 @@ function CartPage() {
                                     "https://placehold.co/250x250?text=No+Image"
                                 }
                                 alt={item.productName}
-                                className="h-44 w-44 rounded-xl object-cover"
+                                className="h-44 w-44 rounded-2xl border border-slate-200 object-cover"
                             />
 
                             {/* Product Details */}
@@ -135,9 +168,9 @@ function CartPage() {
                                         {item.productName}
                                     </h2>
 
-                                    <p className="mt-2 text-gray-500">
-                                        {item.category}
-                                    </p>
+                                    <span className="mt-3 inline-block rounded-full bg-slate-100 px-4 py-1 text-sm font-medium text-slate-600">
+    {item.category}
+</span>
 
                                     <p className="mt-4 text-3xl font-bold text-blue-600">
                                         ₹{item.price.toLocaleString()}
@@ -149,7 +182,7 @@ function CartPage() {
 
                                     {/* Quantity */}
 
-                                    <div className="flex items-center rounded-lg border">
+                                    <div className="flex items-center rounded-xl border border-slate-200 bg-slate-50">
 
                                         <button
                                             onClick={() => {
@@ -164,7 +197,7 @@ function CartPage() {
                                             }}
                                             className="px-4 py-2 text-xl hover:bg-gray-100"
                                         >
-                                            −
+                                            <Minus size={18} />
                                         </button>
 
                                         <span className="px-5 font-semibold">
@@ -180,7 +213,7 @@ function CartPage() {
                                             }
                                             className="px-4 py-2 text-xl hover:bg-gray-100"
                                         >
-                                            +
+                                            <Plus size={18} />
                                         </button>
 
                                     </div>
@@ -220,12 +253,22 @@ function CartPage() {
 
                 <div>
 
-                    <div className="sticky top-24 rounded-2xl bg-white p-6 shadow-md">
+                    <div className="sticky top-24 rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
 
-                        <h2 className="mb-6 text-2xl font-bold">
-                            Order Summary
-                        </h2>
+                        <div className="mb-6 flex items-center gap-3">
 
+    <ShieldCheck
+        className="text-blue-600"
+        size={26}
+    />
+
+    <h2 className="text-2xl font-bold">
+
+        Order Summary
+
+    </h2>
+
+</div>
                         <div className="flex justify-between border-b pb-4">
 
                             <span>Total Items</span>
@@ -252,9 +295,9 @@ function CartPage() {
 
                         <button
     onClick={() => navigate("/checkout")}
-    className="mt-8 w-full rounded-xl bg-blue-600 py-3 text-lg font-semibold text-white transition hover:bg-blue-700"
+    className="mt-8 w-full rounded-2xl bg-blue-600 py-4 text-lg font-semibold text-white shadow-lg transition-all duration-300 hover:-translate-y-1 hover:bg-blue-700 hover:shadow-xl"
 >
-    Proceed to Checkout
+    Secure Checkout →
 </button>
 
                     </div>
