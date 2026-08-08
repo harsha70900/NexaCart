@@ -10,10 +10,8 @@ import { useNavigate } from "react-router-dom";
 import {
     ShoppingCart,
     ShieldCheck,
-    Trash2,
     Plus,
     Minus,
-    Package,
 } from "lucide-react";
 
 function CartPage() {
