@@ -9,41 +9,42 @@ function SortDropdown({
 }: SortDropdownProps) {
 
     return (
-
-        <div className="mb-8">
+        <div className="relative w-full">
 
             <select
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
-                className="rounded-lg border border-gray-300 p-3"
+                className="w-full appearance-none rounded-xl border border-slate-200 bg-white px-4 py-3 pr-10 text-sm font-medium text-slate-700 outline-none transition-all duration-200 hover:border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
             >
 
                 <option value="default">
-                    Default
+                    Sort by: Default
                 </option>
 
                 <option value="price-asc">
-                    Price: Low → High
+                    Price: Low to High
                 </option>
 
                 <option value="price-desc">
-                    Price: High → Low
+                    Price: High to Low
                 </option>
 
                 <option value="name-asc">
-                    Name: A → Z
+                    Name: A to Z
                 </option>
 
                 <option value="name-desc">
-                    Name: Z → A
+                    Name: Z to A
                 </option>
 
             </select>
 
+            <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">
+                ▾
+            </div>
+
         </div>
-
     );
-
 }
 
 export default SortDropdown;

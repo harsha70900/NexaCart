@@ -5,17 +5,23 @@ import {
     type ReactNode,
 } from "react";
 
-import { getToken, removeToken } from "../utils/token";
+import {
+    getToken,
+    saveToken,
+    removeToken,
+} from "../utils/token";
+
+import type { AuthResponse } from "../types/auth";
 
 interface AuthContextType {
     isAuthenticated: boolean;
-    login: () => void;
+    login: (response: AuthResponse) => void;
     logout: () => void;
 }
 
-export const AuthContext = createContext<AuthContextType | undefined>(
-    undefined
-);
+export const AuthContext = createContext<
+    AuthContextType | undefined
+>(undefined);
 
 interface AuthProviderProps {
     children: ReactNode;
@@ -25,38 +31,42 @@ export function AuthProvider({
     children,
 }: AuthProviderProps) {
 
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [isAuthenticated, setIsAuthenticated] =
+        useState(false);
 
     useEffect(() => {
 
-    const token = getToken();
+        const token = getToken();
 
-    setIsAuthenticated(!!token);
+        setIsAuthenticated(!!token);
 
-}, []);
+    }, []);
 
-const login = () => {
-    setIsAuthenticated(true);
-};
+    const login = (response: AuthResponse) => {
 
-const logout = () => {
+        saveToken(response.token);
 
-    removeToken();
+        setIsAuthenticated(true);
 
-    setIsAuthenticated(false);
+    };
 
-};
+    const logout = () => {
 
-return (
-    <AuthContext.Provider
-        value={{
-            isAuthenticated,
-            login,
-            logout,
-        }}
-    >
-        {children}
-    </AuthContext.Provider>
-);
+        removeToken();
 
+        setIsAuthenticated(false);
+
+    };
+
+    return (
+        <AuthContext.Provider
+            value={{
+                isAuthenticated,
+                login,
+                logout,
+            }}
+        >
+            {children}
+        </AuthContext.Provider>
+    );
 }

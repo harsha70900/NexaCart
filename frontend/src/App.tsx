@@ -13,6 +13,7 @@ import CheckoutPage from "./pages/CheckoutPage";
 import OrderSuccessPage from "./pages/OrderSuccessPage";
 import MyOrdersPage from "./pages/MyOrdersPage";
 import OrderDetailsPage from "./pages/OrderDetailsPage";
+import RegisterPage from "./pages/RegisterPage";
 
 function App() {
 
@@ -41,6 +42,8 @@ function App() {
                     path="/login"
                     element={<LoginPage />}
                 />
+
+                <Route path="/register" element={<RegisterPage />} />
 
                 <Route
                     path="/cart"

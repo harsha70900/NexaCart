@@ -1,5 +1,10 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
+import {
+    ShoppingCart,
+    Star,
+    ArrowRight,
+} from "lucide-react";
 import toast from "react-hot-toast";
 
 import { addToCart } from "../../api/cartApi";
@@ -9,9 +14,9 @@ type ProductCardProps = {
     productId: number;
     name: string;
     price: number;
-    image: string;
-    rating: number;
-    inStock: boolean;
+    image?: string;
+    rating?: number;
+    inStock?: boolean;
 };
 
 function ProductCard({
@@ -19,35 +24,31 @@ function ProductCard({
     name,
     price,
     image,
-    rating,
-    inStock,
+    rating = 4.8,
+    inStock = true,
 }: ProductCardProps) {
 
-    const { isAuthenticated } = useAuth();
     const navigate = useNavigate();
 
-    const queryClient = useQueryClient();
+    const { isAuthenticated } = useAuth();
 
-    const mutation = useMutation({
+    const addToCartMutation = useMutation({
+
         mutationFn: addToCart,
 
         onSuccess: (message) => {
 
-            queryClient.invalidateQueries({
-                queryKey: ["cart"],
-            });
-
-            toast.success(message);
+            toast.success(
+                message || "Product added to cart successfully"
+            );
 
         },
 
         onError: (error: any) => {
 
-            console.error(error);
-
             toast.error(
                 error?.response?.data?.message ??
-                "Failed to add product to cart."
+                "Failed to add product to cart"
             );
 
         },
@@ -58,79 +59,169 @@ function ProductCard({
 
         if (!isAuthenticated) {
 
-            toast.error("Please login to continue.");
-
             navigate("/login");
 
             return;
         }
 
-        mutation.mutate({
+        if (!inStock) {
+
+            toast.error("This product is currently out of stock");
+
+            return;
+        }
+
+        addToCartMutation.mutate({
             productId,
             quantity: 1,
         });
+
     };
 
     return (
-        <div className="overflow-hidden rounded-2xl bg-white shadow-md transition duration-300 hover:-translate-y-2 hover:shadow-xl">
 
-            {/* Product Details */}
-            <Link to={`/products/${productId}`}>
+        <div className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-slate-300 hover:shadow-xl">
+
+            {/* ================= PRODUCT IMAGE ================= */}
+
+            <Link
+                to={`/products/${productId}`}
+                className="relative block overflow-hidden bg-slate-100"
+            >
 
                 <img
                     src={
                         image ||
-                        "https://placehold.co/400x400?text=No+Image"
+                        "https://placehold.co/600x600?text=No+Image"
                     }
                     alt={name}
-                    className="h-60 w-full object-cover"
+                    className="aspect-square w-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
 
-                <div className="p-5">
+                {/* Stock Badge */}
 
-                    <h3 className="text-xl font-semibold">
-                        {name}
-                    </h3>
+                <div className="absolute left-4 top-4">
 
-                    <p className="mt-2 text-yellow-500">
-                        ⭐ {rating}
-                    </p>
+                    {inStock ? (
 
-                    <p className="mt-3 text-2xl font-bold text-blue-600">
-                        ₹{price.toLocaleString()}
-                    </p>
+                        <span className="rounded-full bg-white/95 px-3 py-1.5 text-xs font-semibold text-emerald-600 shadow-sm backdrop-blur">
+                            In Stock
+                        </span>
 
-                    <p
-                        className={`mt-2 font-medium ${
-                            inStock
-                                ? "text-green-600"
-                                : "text-red-600"
-                        }`}
-                    >
-                        {inStock
-                            ? "✓ In Stock"
-                            : "Out of Stock"}
-                    </p>
+                    ) : (
+
+                        <span className="rounded-full bg-white/95 px-3 py-1.5 text-xs font-semibold text-red-500 shadow-sm backdrop-blur">
+                            Out of Stock
+                        </span>
+
+                    )}
 
                 </div>
 
             </Link>
 
-            {/* Add to Cart Button */}
-            <div className="px-5 pb-5">
 
-                <button
-                    onClick={handleAddToCart}
-                    disabled={
-                        mutation.isPending ||
-                        !inStock
-                    }
-                    className="w-full rounded-lg bg-blue-600 py-3 font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+            {/* ================= PRODUCT INFORMATION ================= */}
+
+            <div className="p-5">
+
+                {/* Product Name */}
+
+                <Link
+                    to={`/products/${productId}`}
+                    className="block"
                 >
-                    {mutation.isPending
-                        ? "Adding..."
-                        : "Add to Cart"}
-                </button>
+
+                    <h3 className="line-clamp-2 min-h-[48px] text-lg font-bold leading-6 text-slate-900 transition-colors hover:text-blue-600">
+
+                        {name}
+
+                    </h3>
+
+                </Link>
+
+
+                {/* Rating */}
+
+                <div className="mt-3 flex items-center gap-2">
+
+                    <div className="flex items-center gap-1">
+
+                        <Star
+                            size={15}
+                            className="fill-amber-400 text-amber-400"
+                        />
+
+                        <span className="text-sm font-semibold text-slate-700">
+                            {rating.toFixed(1)}
+                        </span>
+
+                    </div>
+
+                    <span className="text-xs text-slate-400">
+                        Customer rating
+                    </span>
+
+                </div>
+
+
+                {/* Price */}
+
+                <div className="mt-4">
+
+                    <span className="text-2xl font-bold tracking-tight text-slate-900">
+
+                        ₹{price.toLocaleString("en-IN")}
+
+                    </span>
+
+                </div>
+
+
+                {/* ================= ACTIONS ================= */}
+
+                <div className="mt-5 space-y-3">
+
+                    {/* Add To Cart */}
+
+                    <button
+                        onClick={handleAddToCart}
+                        disabled={
+                            !inStock ||
+                            addToCartMutation.isPending
+                        }
+                        className={`flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold transition-all duration-200 ${
+                            inStock
+                                ? "bg-blue-600 text-white shadow-sm shadow-blue-600/20 hover:bg-blue-700 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-60"
+                                : "cursor-not-allowed bg-slate-100 text-slate-400"
+                        }`}
+                    >
+
+                        <ShoppingCart size={17} />
+
+                        {!inStock
+                            ? "Out of Stock"
+                            : addToCartMutation.isPending
+                                ? "Adding..."
+                                : "Add to Cart"}
+
+                    </button>
+
+
+                    {/* View Details */}
+
+                    <Link
+                        to={`/products/${productId}`}
+                        className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-700 transition-all duration-200 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600"
+                    >
+
+                        View Details
+
+                        <ArrowRight size={16} />
+
+                    </Link>
+
+                </div>
 
             </div>
 
