@@ -23,12 +23,45 @@ public class PaymentController {
 
     @PostMapping("/create-order")
     public ResponseEntity<CreatePaymentOrderResponse> createOrder() {
-        return ResponseEntity.ok(paymentService.createPaymentOrder());
+
+        return ResponseEntity.ok(
+                paymentService.createPaymentOrder()
+        );
     }
 
     @PostMapping("/verify")
-    public ResponseEntity<Map<String, String>> verifyPayment(@Valid @RequestBody VerifyPaymentRequest request) {
-        String message = paymentService.verifyPayment(request);
-        return ResponseEntity.ok(Map.of("message", message));
+    public ResponseEntity<Map<String, String>> verifyPayment(
+            @Valid @RequestBody VerifyPaymentRequest request) {
+
+        String message =
+                paymentService.verifyPayment(request);
+
+        return ResponseEntity.ok(
+                Map.of("message", message)
+        );
+    }
+
+    @PostMapping("/cancel/{orderId}")
+    public ResponseEntity<Map<String, String>> cancelPayment(
+            @PathVariable Long orderId) {
+
+        String message =
+                paymentService.cancelPayment(orderId);
+
+        return ResponseEntity.ok(
+                Map.of("message", message)
+        );
+    }
+
+    @PostMapping("/fail/{orderId}")
+    public ResponseEntity<Map<String, String>> failPayment(
+            @PathVariable Long orderId) {
+
+        String message =
+                paymentService.failPayment(orderId);
+
+        return ResponseEntity.ok(
+                Map.of("message", message)
+        );
     }
 }

@@ -181,4 +181,69 @@ public class PaymentService {
                 .setScale(0, RoundingMode.HALF_UP)
                 .longValueExact();
     }
+    
+    
+    @Transactional
+    public String failPayment(Long orderId) {
+
+        User user = getCurrentUser();
+
+        PurchaseOrder order =
+                purchaseOrderRepository
+                        .findByIdAndUser(orderId, user)
+                        .orElseThrow(
+                                () -> new RuntimeException("Order not found")
+                        );
+
+        /*
+         * If payment was already completed,
+         * do not change the order back to failed.
+         */
+        if ("PAID".equals(order.getStatus())) {
+            return "Order has already been paid";
+        }
+
+        /*
+         * Only a pending payment can become failed.
+         */
+        if ("PENDING_PAYMENT".equals(order.getStatus())) {
+
+            order.setStatus("PAYMENT_FAILED");
+
+            purchaseOrderRepository.save(order);
+
+            return "Payment failed";
+        }
+
+        return "Payment cannot be marked as failed";
+    }
+    
+    @Transactional
+    public String cancelPayment(Long orderId) {
+
+        User user = getCurrentUser();
+
+        PurchaseOrder order =
+                purchaseOrderRepository
+                        .findByIdAndUser(orderId, user)
+                        .orElseThrow(
+                                () -> new RuntimeException("Order not found")
+                        );
+
+        if ("PAID".equals(order.getStatus())) {
+
+            return "Order has already been paid";
+        }
+
+        if ("PENDING_PAYMENT".equals(order.getStatus())) {
+
+            order.setStatus("CANCELLED");
+
+            purchaseOrderRepository.save(order);
+
+            return "Payment cancelled";
+        }
+
+        return "Payment cannot be cancelled";
+    }
 }
