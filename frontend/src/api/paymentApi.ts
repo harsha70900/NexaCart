@@ -1,4 +1,5 @@
 import api from "./axios";
+
 import type {
     CreatePaymentOrderResponse,
     VerifyPaymentRequest,
@@ -6,9 +7,10 @@ import type {
 
 export async function createPaymentOrder(): Promise<CreatePaymentOrderResponse> {
 
-    const response = await api.post<CreatePaymentOrderResponse>(
-        "/customer/payment/create-order"
-    );
+    const response =
+        await api.post<CreatePaymentOrderResponse>(
+            "/customer/payment/create-order"
+        );
 
     return response.data;
 }
@@ -17,10 +19,35 @@ export async function verifyPayment(
     request: VerifyPaymentRequest
 ): Promise<string> {
 
-    const response = await api.post<{ message: string }>(
-        "/customer/payment/verify",
-        request
-    );
+    const response =
+        await api.post<{ message: string }>(
+            "/customer/payment/verify",
+            request
+        );
+
+    return response.data.message;
+}
+
+export async function cancelPayment(
+    orderId: number
+): Promise<string> {
+
+    const response =
+        await api.post<{ message: string }>(
+            `/customer/payment/cancel/${orderId}`
+        );
+
+    return response.data.message;
+}
+
+export async function failPayment(
+    orderId: number
+): Promise<string> {
+
+    const response =
+        await api.post<{ message: string }>(
+            `/customer/payment/fail/${orderId}`
+        );
 
     return response.data.message;
 }

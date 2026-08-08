@@ -1,15 +1,19 @@
-import { useMutation } from "@tanstack/react-query";
-import { createPaymentOrder } from "../api/paymentApi";
-import toast from "react-hot-toast";
-import { verifyPayment } from "../api/paymentApi";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import { useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
+
+import {
+    createPaymentOrder,
+    verifyPayment,
+    cancelPayment,
+    failPayment,
+} from "../api/paymentApi";
 
 function CheckoutPage() {
 
     const navigate = useNavigate();
 
-const queryClient = useQueryClient();
+    const queryClient = useQueryClient();
 
     const paymentMutation = useMutation({
 
@@ -17,71 +21,170 @@ const queryClient = useQueryClient();
 
         onSuccess: (data) => {
 
-    const options = {
+            const options = {
 
-        key: data.keyId,
+                key: data.keyId,
 
-        amount: data.amount,
+                amount: data.amount,
 
-        currency: data.currency,
+                currency: data.currency,
 
-        name: "NexaCart",
+                name: "NexaCart",
 
-        description: "Order Payment",
+                description: "Order Payment",
 
-        order_id: data.razorpayOrderId,
+                order_id: data.razorpayOrderId,
 
-        handler: async function (response: any) {
+                handler: async function (response: any) {
 
-    try {
+                    try {
 
-        const message = await verifyPayment({
+                        const message = await verifyPayment({
 
-            localOrderId: data.localOrderId,
+                            localOrderId: data.localOrderId,
 
-            razorpayOrderId: response.razorpay_order_id,
+                            razorpayOrderId:
+                                response.razorpay_order_id,
 
-            razorpayPaymentId: response.razorpay_payment_id,
+                            razorpayPaymentId:
+                                response.razorpay_payment_id,
 
-            razorpaySignature: response.razorpay_signature,
+                            razorpaySignature:
+                                response.razorpay_signature,
 
-        });
+                        });
 
-        toast.success(message);
+                        /*
+                         * Payment verification succeeded.
+                         *
+                         * Backend has:
+                         * - created OrderItems
+                         * - updated product stock
+                         * - saved payment transaction
+                         * - marked order as PAID
+                         * - cleared the cart
+                         */
 
-queryClient.invalidateQueries({
-    queryKey: ["cart"],
-});
+                        await queryClient.invalidateQueries({
+                            queryKey: ["cart"],
+                        });
 
-navigate("/order-success");
+                        await queryClient.invalidateQueries({
+                            queryKey: ["orders"],
+                        });
 
-    } catch (error: any) {
+                        toast.success(message);
 
-        toast.error(
+                        navigate("/order-success");
 
-            error?.response?.data?.message ??
+                    } catch (error: any) {
 
-            "Payment verification failed."
+                        console.error(
+                            "Payment verification failed:",
+                            error
+                        );
 
-        );
+                        toast.error(
+                            error?.response?.data?.message ??
+                            "Payment verification failed."
+                        );
 
-    }
+                    }
 
-},
+                },
 
-        theme: {
-            color: "#2563eb",
+                /*
+                 * User closes the Razorpay payment window.
+                 */
+                modal: {
+
+                    ondismiss: async () => {
+
+                        try {
+
+                            await cancelPayment(
+                                data.localOrderId
+                            );
+
+                            toast.error(
+                                "Payment cancelled. Your cart is still saved."
+                            );
+
+                        } catch (error) {
+
+                            console.error(
+                                "Failed to update cancellation:",
+                                error
+                            );
+
+                            toast.error(
+                                "Payment cancelled. Your cart is still saved."
+                            );
+
+                        }
+
+                    },
+
+                },
+
+                theme: {
+                    color: "#2563eb",
+                },
+
+            };
+
+            const razorpay =
+                new window.Razorpay(options);
+
+            /*
+             * Actual Razorpay payment failure.
+             */
+            razorpay.on(
+                "payment.failed",
+                async function (response: any) {
+
+                    console.error(
+                        "Razorpay payment failed:",
+                        response?.error
+                    );
+
+                    try {
+
+                        await failPayment(
+                            data.localOrderId
+                        );
+
+                        toast.error(
+                            response?.error?.description ??
+                            "Payment failed. Your cart is still saved."
+                        );
+
+                    } catch (error) {
+
+                        console.error(
+                            "Failed to update payment failure:",
+                            error
+                        );
+
+                        toast.error(
+                            "Payment failed. Your cart is still saved."
+                        );
+
+                    }
+
+                }
+            );
+
+            razorpay.open();
+
         },
 
-    };
-
-    const razorpay = new window.Razorpay(options);
-
-    razorpay.open();
-
-},
-
         onError: (error: any) => {
+
+            console.error(
+                "Create payment order failed:",
+                error
+            );
 
             toast.error(
                 error?.response?.data?.message ??
@@ -92,42 +195,111 @@ navigate("/order-success");
 
     });
 
+    const handlePayment = () => {
+
+        if (paymentMutation.isPending) {
+            return;
+        }
+
+        paymentMutation.mutate();
+
+    };
+
     return (
 
         <div className="mx-auto max-w-5xl px-6 py-12">
 
-            <h1 className="mb-10 text-4xl font-bold">
+            {/* Header */}
 
-                Checkout
+            <div className="mb-10">
 
-            </h1>
+                <p className="text-sm font-semibold uppercase tracking-[0.18em] text-blue-600">
+                    Secure Checkout
+                </p>
 
-            <div className="rounded-xl bg-white p-8 shadow-lg">
+                <h1 className="mt-2 text-4xl font-bold tracking-tight text-slate-900">
+                    Checkout
+                </h1>
 
-                <h2 className="mb-6 text-2xl font-semibold">
+                <p className="mt-2 text-slate-500">
+                    Complete your payment securely with Razorpay.
+                </p>
 
-                    Order Summary
+            </div>
 
-                </h2>
+
+            {/* Checkout Card */}
+
+            <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-lg">
+
+                <div className="mb-8">
+
+                    <h2 className="text-2xl font-bold text-slate-900">
+                        Order Summary
+                    </h2>
+
+                    <p className="mt-2 text-sm text-slate-500">
+                        Your cart will be converted into an order
+                        after successful payment verification.
+                    </p>
+
+                </div>
+
+
+                {/* Payment Information */}
+
+                <div className="mb-8 rounded-xl bg-slate-50 p-5">
+
+                    <div className="flex items-center justify-between">
+
+                        <div>
+
+                            <p className="font-semibold text-slate-800">
+                                Secure Payment
+                            </p>
+
+                            <p className="mt-1 text-sm text-slate-500">
+                                Payments are securely processed by Razorpay.
+                            </p>
+
+                        </div>
+
+                        <span className="rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-600">
+                            Secure
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                {/* Payment Button */}
 
                 <button
-                    onClick={() => paymentMutation.mutate()}
+                    onClick={handlePayment}
                     disabled={paymentMutation.isPending}
-                    className="w-full rounded-lg bg-green-600 py-4 text-lg font-semibold text-white transition hover:bg-green-700 disabled:opacity-50"
+                    className="w-full rounded-xl bg-blue-600 py-4 text-lg font-semibold text-white shadow-md shadow-blue-600/20 transition-all duration-200 hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-600/25 disabled:cursor-not-allowed disabled:opacity-60"
                 >
 
                     {paymentMutation.isPending
-                        ? "Creating Order..."
-                        : "Pay with Razorpay"}
+                        ? "Preparing Secure Payment..."
+                        : "Pay Securely with Razorpay"}
 
                 </button>
+
+
+                {/* Payment Notice */}
+
+                <p className="mt-4 text-center text-xs text-slate-400">
+                    Your cart will only be cleared after successful
+                    payment verification.
+                </p>
 
             </div>
 
         </div>
 
     );
-
 }
 
 export default CheckoutPage;
