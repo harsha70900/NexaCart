@@ -75,7 +75,7 @@ function CheckoutPage() {
 
                         toast.success(message);
 
-                        navigate("/order-success");
+                        navigate(`/order-success?orderId=${data.localOrderId}`);
 
                     } catch (error: any) {
 

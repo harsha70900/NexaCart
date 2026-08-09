@@ -1,168 +1,140 @@
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import {
-    CheckCircle2,
+    CheckCircle,
     Package,
-    Truck,
-    ShoppingBag,
     ArrowRight,
+    ShoppingBag,
 } from "lucide-react";
 
 function OrderSuccessPage() {
+
+    const [searchParams] = useSearchParams();
+
+    const orderId = searchParams.get("orderId");
+
     return (
-        <div className="min-h-screen bg-slate-50">
 
-            <div className="mx-auto flex max-w-4xl items-center justify-center px-6 py-16">
+        <div className="flex min-h-[70vh] items-center justify-center px-6 py-12">
 
-                <div className="w-full rounded-3xl border border-slate-200 bg-white p-10 shadow-xl">
+            <div className="w-full max-w-2xl">
+
+                {/* Success Card */}
+
+                <div className="rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-xl sm:p-12">
 
                     {/* Success Icon */}
 
-                    <div className="flex justify-center">
+                    <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-emerald-50">
 
-                        <div className="rounded-full bg-green-100 p-6">
-
-                            <CheckCircle2
-                                size={80}
-                                className="text-green-600"
-                            />
-
-                        </div>
+                        <CheckCircle
+                            size={48}
+                            className="text-emerald-500"
+                        />
 
                     </div>
+
 
                     {/* Heading */}
 
-                    <div className="mt-8 text-center">
+                    <h1 className="mt-6 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
 
-                        <h1 className="text-5xl font-bold text-slate-900">
+                        Order Placed Successfully!
 
-                            Order Placed Successfully!
+                    </h1>
 
-                        </h1>
 
-                        <p className="mt-4 text-lg text-slate-500">
+                    <p className="mx-auto mt-4 max-w-lg text-slate-500">
 
-                            Thank you for shopping with NexaCart.
+                        Thank you for shopping with NexaCart.
+                        Your payment has been successfully verified
+                        and your order has been confirmed.
 
-                        </p>
+                    </p>
 
-                        <p className="text-slate-500">
 
-                            Your payment has been received successfully.
+                    {/* Order Information */}
 
-                        </p>
+                    {orderId && (
 
-                    </div>
+                        <div className="mx-auto mt-8 max-w-md rounded-2xl bg-slate-50 p-5">
 
-                    {/* Information Cards */}
-
-                    <div className="mt-12 grid gap-6 md:grid-cols-2">
-
-                        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
-
-                            <div className="mb-4 flex items-center gap-3">
+                            <div className="flex items-center justify-center gap-3">
 
                                 <Package
-                                    size={28}
+                                    size={22}
                                     className="text-blue-600"
                                 />
 
-                                <h2 className="text-xl font-bold">
-
-                                    Order Confirmed
-
-                                </h2>
-
-                            </div>
-
-                            <p className="leading-7 text-slate-600">
-
-                                Your order has been confirmed and is now
-                                being prepared for dispatch.
-
-                            </p>
-
-                        </div>
-
-                        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
-
-                            <div className="mb-4 flex items-center gap-3">
-
-                                <Truck
-                                    size={28}
-                                    className="text-blue-600"
-                                />
-
-                                <h2 className="text-xl font-bold">
-
-                                    Estimated Delivery
-
-                                </h2>
-
-                            </div>
-
-                            <p className="leading-7 text-slate-600">
-
-                                Your order is expected to arrive within
-
-                                <span className="font-semibold text-slate-900">
-
-                                    {" "}3–5 business days.
-
+                                <span className="text-sm font-medium text-slate-500">
+                                    Order ID
                                 </span>
 
+                            </div>
+
+                            <p className="mt-2 text-2xl font-bold text-slate-900">
+
+                                #{orderId}
+
                             </p>
+
+                            <div className="mt-3 inline-flex items-center rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-600">
+
+                                Payment Successful
+
+                            </div>
 
                         </div>
 
-                    </div>
+                    )}
 
-                    {/* Buttons */}
 
-                    <div className="mt-12 flex flex-col justify-center gap-4 sm:flex-row">
+                    {/* Actions */}
+
+                    <div className="mt-10 flex flex-col justify-center gap-4 sm:flex-row">
+
+                        {orderId && (
+
+                            <Link
+                                to={`/orders/${orderId}`}
+                                className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-3.5 font-semibold text-white shadow-md shadow-blue-600/20 transition hover:bg-blue-700"
+                            >
+
+                                <Package size={18} />
+
+                                View Order Details
+
+                                <ArrowRight size={18} />
+
+                            </Link>
+
+                        )}
 
                         <Link
                             to="/orders"
-                            className="inline-flex items-center justify-center gap-2 rounded-2xl bg-blue-600 px-8 py-4 font-semibold text-white shadow-lg transition-all duration-300 hover:-translate-y-1 hover:bg-blue-700 hover:shadow-xl"
+                            className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-6 py-3.5 font-semibold text-slate-700 transition hover:bg-slate-50"
                         >
-                            <ShoppingBag size={20} />
 
-                            View My Orders
+                            <ShoppingBag size={18} />
 
-                            <ArrowRight size={18} />
+                            My Orders
 
-                        </Link>
-
-                        <Link
-                            to="/products"
-                            className="inline-flex items-center justify-center rounded-2xl border border-slate-300 bg-white px-8 py-4 font-semibold text-slate-700 transition-all duration-300 hover:-translate-y-1 hover:bg-slate-100"
-                        >
-                            Continue Shopping
                         </Link>
 
                     </div>
 
-                    {/* Footer */}
 
-                    <div className="mt-12 border-t border-slate-200 pt-8 text-center">
+                    {/* Continue Shopping */}
 
-                        <p className="text-slate-500">
+                    <div className="mt-8 border-t border-slate-100 pt-6">
 
-                            ❤️ Thank you for choosing
+                        <Link
+                            to="/products"
+                            className="text-sm font-semibold text-blue-600 transition hover:text-blue-700"
+                        >
 
-                            <span className="font-semibold text-blue-600">
+                            Continue Shopping
 
-                                {" "}NexaCart
-
-                            </span>
-
-                        </p>
-
-                        <p className="mt-2 text-sm text-slate-400">
-
-                            We appreciate your trust and hope to see you again.
-
-                        </p>
+                        </Link>
 
                     </div>
 
@@ -171,6 +143,7 @@ function OrderSuccessPage() {
             </div>
 
         </div>
+
     );
 }
 
