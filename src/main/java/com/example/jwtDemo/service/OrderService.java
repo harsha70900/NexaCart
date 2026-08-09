@@ -39,6 +39,7 @@ public class OrderService {
         return purchaseOrderRepository
                 .findByUserOrderByIdDesc(user)
                 .stream()
+                .filter(order -> "PAID".equals(order.getStatus()))
                 .map(order -> new OrderSummaryResponse(
                         order.getId(),
                         order.getTotalAmount(),
