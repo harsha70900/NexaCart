@@ -17,12 +17,18 @@ import java.util.List; // 👈 Required Import
 
 import com.example.jwtDemo.filter.JwtAuthenticationFilter;
 import com.example.jwtDemo.service.CustomUserDetailsService;
+import org.springframework.beans.factory.annotation.Value;
+
+
 
 @Configuration
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final CustomUserDetailsService customUserDetailsService;
+    
+    @Value("${app.frontend.url}")
+    private String frontendUrl;
 
     public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter,
                           CustomUserDetailsService customUserDetailsService) {
@@ -38,7 +44,7 @@ public class SecurityConfig {
             // 1. Injected CORS rule directly into the filter chain
             .cors(cors -> cors.configurationSource(request -> {
                 CorsConfiguration config = new CorsConfiguration();
-                config.setAllowedOrigins(List.of("http://localhost:5173"));
+                config.setAllowedOrigins(List.of(frontendUrl));
                 config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                 config.setAllowedHeaders(List.of("*"));
                 config.setAllowCredentials(true);

@@ -31,7 +31,6 @@ build/
 
 # Environment / secrets
 frontend/.env
-src/main/resources/application.properties
 
 # Build output
 target/
