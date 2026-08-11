@@ -9,6 +9,7 @@ import {
     getToken,
     saveToken,
     removeToken,
+    isTokenExpired,
 } from "../utils/token";
 
 import type { AuthResponse } from "../types/auth";
@@ -38,7 +39,18 @@ export function AuthProvider({
 
         const token = getToken();
 
-        setIsAuthenticated(!!token);
+        if (!token) {
+            setIsAuthenticated(false);
+            return;
+        }
+
+        if (isTokenExpired(token)) {
+            removeToken();
+            setIsAuthenticated(false);
+            return;
+        }
+
+        setIsAuthenticated(true);
 
     }, []);
 
