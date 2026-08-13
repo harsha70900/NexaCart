@@ -1,5 +1,6 @@
+import { useQuery } from "@tanstack/react-query";
 import { useParams, useNavigate } from "react-router-dom";
-import { useQuery, useMutation } from "@tanstack/react-query";
+
 import {
     ShoppingCart,
     Star,
@@ -8,49 +9,133 @@ import {
     ArrowLeft,
 } from "lucide-react";
 
-import { getProductById } from "../api/productApi";
-import LoadingSpinner from "../components/ui/LoadingSpinner";
-import { addToCart } from "../api/cartApi";
-import { useAuth } from "../hooks/useAuth";
 import toast from "react-hot-toast";
+
+import { useMutation } from "@tanstack/react-query";
+
+import { getProductById } from "../api/productApi";
+import { addToCart } from "../api/cartApi";
+
+import LoadingSpinner from "../components/ui/LoadingSpinner";
+
+import { useAuth } from "../hooks/useAuth";
+
+import type { Product } from "../types/product";
+
 
 function ProductDetailsPage() {
 
-    const { isAuthenticated } = useAuth();
+    const { id } = useParams();
 
     const navigate = useNavigate();
 
-    const { id } = useParams();
+    const { isAuthenticated } = useAuth();
 
     const productId = Number(id);
 
+
+    // ========================================================
+    // First get the products already available in React Query
+    // ========================================================
+
     const {
-        data: product,
-        isLoading,
-        error,
-    } = useQuery({
-        queryKey: ["product", productId],
-        queryFn: () => getProductById(productId),
+        data: products = [],
+    } = useQuery<Product[]>({
+
+        queryKey: ["products"],
+
+        // This should normally already exist because the
+        // Products page uses fallbackProducts + React Query.
+        //
+        // We don't need to fetch again here.
+
+        queryFn: async () => {
+            return [];
+        },
+
+        enabled: false,
+
     });
+
+
+    // ========================================================
+    // Find product from already loaded products
+    // ========================================================
+
+    const cachedProduct = products.find(
+        (product) => product.id === productId
+    );
+
+
+    // ========================================================
+    // Direct Product Request
+    // ========================================================
+    //
+    // Only used when the product is NOT already available
+    // in the products cache.
+    //
+    // Example:
+    //
+    // User directly opens:
+    // /products/5
+    //
+    // without visiting /products first.
+    //
+    // ========================================================
+
+    const {
+        data: directProduct,
+        isLoading: isDirectLoading,
+        error: directError,
+    } = useQuery<Product>({
+
+        queryKey: ["product", productId],
+
+        queryFn: () => getProductById(productId),
+
+        enabled: !cachedProduct,
+
+        retry: 1,
+
+    });
+
+
+    // ========================================================
+    // Select Product
+    // ========================================================
+
+    const product =
+        cachedProduct ?? directProduct;
+
+
+    // ========================================================
+    // Add To Cart
+    // ========================================================
 
     const addToCartMutation = useMutation({
 
         mutationFn: addToCart,
 
         onSuccess: (message) => {
-            toast.success(message);
+
+            toast.success(
+                message ||
+                "Product added to cart successfully"
+            );
+
         },
 
         onError: (error: any) => {
 
             toast.error(
                 error?.response?.data?.message ??
-                "Failed to add product"
+                "Failed to add product to cart"
             );
 
         },
 
     });
+
 
     const handleAddToCart = () => {
 
@@ -59,38 +144,73 @@ function ProductDetailsPage() {
             navigate("/login");
 
             return;
+
         }
 
-        if (!product) return;
+
+        if (!product) {
+
+            return;
+
+        }
+
+
+        if (product.stock <= 0) {
+
+            toast.error(
+                "This product is currently out of stock"
+            );
+
+            return;
+
+        }
+
 
         addToCartMutation.mutate({
+
             productId: product.id,
+
             quantity: 1,
+
         });
 
     };
 
-    if (isLoading) {
+
+    // ========================================================
+    // Loading
+    // ========================================================
+
+    if (!product && isDirectLoading) {
+
         return <LoadingSpinner />;
+
     }
 
-    if (error) {
+
+    // ========================================================
+    // Error
+    // ========================================================
+
+    if (!product && directError) {
 
         return (
+
             <div className="flex min-h-[60vh] items-center justify-center px-6">
 
                 <div className="text-center">
 
                     <Package
-                        size={48}
+                        size={52}
                         className="mx-auto mb-4 text-red-500"
                     />
 
                     <h2 className="text-2xl font-bold text-slate-900">
 
-                        Failed to load product.
+                        Failed to load product
 
                     </h2>
+
 
                     <p className="mt-2 text-slate-500">
 
@@ -98,28 +218,75 @@ function ProductDetailsPage() {
 
                     </p>
 
+
+                    <button
+                        onClick={() =>
+                            navigate("/products")
+                        }
+                        className="mt-6 rounded-xl bg-blue-600 px-6 py-3 font-semibold text-white hover:bg-blue-700"
+                    >
+
+                        Back to Products
+
+                    </button>
+
                 </div>
 
             </div>
+
         );
 
     }
+
+
+    // ========================================================
+    // Product Not Found
+    // ========================================================
 
     if (!product) {
 
         return (
-            <div className="flex min-h-[60vh] items-center justify-center">
 
-                <h2 className="text-2xl font-bold text-slate-900">
+            <div className="flex min-h-[60vh] items-center justify-center px-6">
 
-                    Product not found.
+                <div className="text-center">
 
-                </h2>
+                    <Package
+                        size={52}
+                        className="mx-auto mb-4 text-slate-300"
+                    />
+
+
+                    <h2 className="text-2xl font-bold text-slate-900">
+
+                        Product not found
+
+                    </h2>
+
+
+                    <button
+                        onClick={() =>
+                            navigate("/products")
+                        }
+                        className="mt-6 rounded-xl bg-blue-600 px-6 py-3 font-semibold text-white hover:bg-blue-700"
+                    >
+
+                        Back to Products
+
+                    </button>
+
+                </div>
 
             </div>
+
         );
 
     }
+
+
+    // ========================================================
+    // UI
+    // ========================================================
 
     return (
 
@@ -127,10 +294,15 @@ function ProductDetailsPage() {
 
             <div className="mx-auto max-w-7xl px-6 py-10">
 
-                {/* Back to Products */}
+
+                {/* ==================================================
+                    BACK
+                ================================================== */}
 
                 <button
-                    onClick={() => navigate("/products")}
+                    onClick={() =>
+                        navigate("/products")
+                    }
                     className="mb-8 inline-flex items-center gap-2 font-medium text-slate-600 transition hover:text-blue-600"
                 >
 
@@ -140,11 +312,15 @@ function ProductDetailsPage() {
 
                 </button>
 
-                {/* Product Section */}
+
+                {/* ==================================================
+                    PRODUCT
+                ================================================== */}
 
                 <div className="grid gap-10 lg:grid-cols-2">
 
-                    {/* ================= IMAGE ================= */}
+
+                    {/* IMAGE */}
 
                     <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
 
@@ -163,11 +339,13 @@ function ProductDetailsPage() {
 
                     </div>
 
-                    {/* ================= PRODUCT INFO ================= */}
+
+                    {/* INFORMATION */}
 
                     <div className="flex flex-col justify-center">
 
-                        {/* Category */}
+
+                        {/* CATEGORY */}
 
                         <div>
 
@@ -179,7 +357,8 @@ function ProductDetailsPage() {
 
                         </div>
 
-                        {/* Product Name */}
+
+                        {/* NAME */}
 
                         <h1 className="mt-5 text-4xl font-bold tracking-tight text-slate-900 md:text-5xl">
 
@@ -187,7 +366,8 @@ function ProductDetailsPage() {
 
                         </h1>
 
-                        {/* Rating */}
+
+                        {/* RATING */}
 
                         <div className="mt-5 flex items-center gap-3">
 
@@ -198,8 +378,14 @@ function ProductDetailsPage() {
                                     className="fill-yellow-400 text-yellow-400"
                                 />
 
+                                <span className="font-semibold text-slate-700">
+
+                                    4.8
+
+                                </span>
 
                             </div>
+
 
                             <span className="text-sm text-slate-500">
 
@@ -209,7 +395,8 @@ function ProductDetailsPage() {
 
                         </div>
 
-                        {/* Price */}
+
+                        {/* PRICE */}
 
                         <div className="mt-7">
 
@@ -219,15 +406,20 @@ function ProductDetailsPage() {
 
                             </p>
 
+
                             <p className="mt-1 text-4xl font-bold text-blue-600">
 
-                                ₹{product.price.toLocaleString()}
+                                ₹
+                                {product.price.toLocaleString(
+                                    "en-IN"
+                                )}
 
                             </p>
 
                         </div>
 
-                        {/* Stock */}
+
+                        {/* STOCK */}
 
                         <div className="mt-6">
 
@@ -241,7 +433,10 @@ function ProductDetailsPage() {
 
                                     <span className="font-normal">
 
-                                        ({product.stock} available)
+                                        (
+                                        {product.stock}
+                                        {" "}
+                                        available)
 
                                     </span>
 
@@ -261,11 +456,11 @@ function ProductDetailsPage() {
 
                         </div>
 
-                        {/* Divider */}
 
                         <div className="my-8 border-t border-slate-200" />
 
-                        {/* Description */}
+
+                        {/* DESCRIPTION */}
 
                         <div>
 
@@ -275,6 +470,7 @@ function ProductDetailsPage() {
 
                             </h2>
 
+
                             <p className="mt-4 leading-8 text-slate-600">
 
                                 {product.description}
@@ -283,7 +479,8 @@ function ProductDetailsPage() {
 
                         </div>
 
-                        {/* Add to Cart */}
+
+                        {/* ADD TO CART */}
 
                         <button
                             onClick={handleAddToCart}
@@ -296,6 +493,7 @@ function ProductDetailsPage() {
 
                             <ShoppingCart size={22} />
 
+
                             {addToCartMutation.isPending
                                 ? "Adding..."
                                 : product.stock <= 0
@@ -304,9 +502,11 @@ function ProductDetailsPage() {
 
                         </button>
 
-                        {/* Security Information */}
+
+                        {/* FEATURES */}
 
                         <div className="mt-6 grid gap-4 sm:grid-cols-2">
+
 
                             <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4">
 
@@ -319,6 +519,7 @@ function ProductDetailsPage() {
 
                                 </div>
 
+
                                 <div>
 
                                     <p className="font-semibold text-slate-900">
@@ -326,6 +527,7 @@ function ProductDetailsPage() {
                                         Secure Shopping
 
                                     </p>
+
 
                                     <p className="text-sm text-slate-500">
 
@@ -336,6 +538,7 @@ function ProductDetailsPage() {
                                 </div>
 
                             </div>
+
 
                             <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4">
 
@@ -348,6 +551,7 @@ function ProductDetailsPage() {
 
                                 </div>
 
+
                                 <div>
 
                                     <p className="font-semibold text-slate-900">
@@ -355,6 +559,7 @@ function ProductDetailsPage() {
                                         Quality Products
 
                                     </p>
+
 
                                     <p className="text-sm text-slate-500">
 
@@ -366,6 +571,7 @@ function ProductDetailsPage() {
 
                             </div>
 
+
                         </div>
 
                     </div>
@@ -375,7 +581,10 @@ function ProductDetailsPage() {
             </div>
 
         </div>
+
     );
+
 }
+
 
 export default ProductDetailsPage;
