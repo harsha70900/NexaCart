@@ -365,17 +365,25 @@ Configure the required environment variables according to your deployment enviro
 
 ## 📸 Screenshots
 
-> Screenshots will be added here to showcase the application UI.
-
 ### 🏠 Home Page
+
+<img width="958" height="502" alt="Nexa Home" src="https://github.com/user-attachments/assets/dbaa1fa0-9fbc-4e3d-90a0-8489d7bf617d" />
 
 ### 🛍️ Products
 
+<img width="1876" height="1016" alt="image" src="https://github.com/user-attachments/assets/e5e711bb-a640-4011-9239-8c066bf43d40" />
+
 ### 📦 Product Details
+
+<img width="1853" height="1008" alt="image" src="https://github.com/user-attachments/assets/cd237ab4-d740-47b4-81b3-9f0ebdadb8ca" />
 
 ### 🛒 Shopping Cart
 
+<img width="1870" height="1019" alt="image" src="https://github.com/user-attachments/assets/4ef2ba2f-d922-48c5-9156-c99c19a50b73" />
+
 ### 💳 Checkout
+
+<img width="952" height="506" alt="Nexa payment" src="https://github.com/user-attachments/assets/bc1d6b0c-2b43-4f85-958b-cdcc557419ab" />
 
 ---
 
