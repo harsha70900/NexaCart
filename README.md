@@ -16,8 +16,7 @@ The application combines a **React + TypeScript frontend** with a **Spring Boot 
 
 ## 🚀 Live Application
 
-🌐 **Live Demo:**  
-https://nexacart-b1rk.onrender.com/
+🌐 **Live Demo:**  https://nexacart-b1rk.onrender.com/
 
 🔗 **GitHub Repository:**
 https://github.com/harsha70900/NexaCart
