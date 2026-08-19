@@ -4,13 +4,20 @@
 
 NexaCart is a secure full-stack e-commerce web application built to provide a modern online shopping experience with secure authentication, product management, shopping features, and online payment integration.
 
+<p align="center">
+  <a href="https://nexacart-b1rk.onrender.com/">
+    <img src="https://img.shields.io/badge/🚀%20Live%20Demo-NexaCart-blue?style=for-the-badge" alt="Live Demo">
+  </a>
+</p>
+
 The application combines a **React + TypeScript frontend** with a **Spring Boot REST API backend**, **Spring Security + JWT authentication**, **MySQL**, and **Razorpay payment integration**.
 
 ---
 
 ## 🚀 Live Application
 
-🌐 **Frontend:** Add your deployed frontend URL here
+🌐 **Live Demo:**  
+https://nexacart-b1rk.onrender.com/
 
 🔗 **GitHub Repository:**
 https://github.com/harsha70900/NexaCart
